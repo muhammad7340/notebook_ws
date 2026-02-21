@@ -1,0 +1,89 @@
+### Check if current folder is a git repo
+```bash
+cd ~/ros2_ws
+git rev-parse --show-toplevel 2>/dev/null || echo "Not a git repo"
+ls -la | grep .git
+find src -type d -name ".git"
+```
+### Create a .gitignore file
+```bash
+cd ~/ros2_ws
+nano .gitignore
+```
+### Example content for gitignore file (ROS2 + Python + large files)
+```bash
+# ROS2
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+
+# VSCode
+.vscode/
+
+### Virtual environments
+.venv/
+venv/
+
+### OS
+.DS_Store
+
+### Large files
+*.bag
+*.db3
+*.zip
+*.pth
+*.pt
+*.onnx
+*.mp4
+*.avi
+```
+
+### Initialize a new git repository
+```bash
+cd ~/ros2_ws
+git init
+git branch -M main
+```
+### Check git status before committing
+```bash
+git status
+git status | head -n 20
+```
+### Stage and commit files
+```bash 
+git add .
+git commit -m "Initial commit with .gitignore"
+```
+### Generate SSH keys (if not already present)
+```bash
+ls -al ~/.ssh        # check existing keys
+ssh-keygen -t ed25519 -C "your_email@example.com"   # create key if not present
+cat ~/.ssh/id_ed25519.pub    # view public key
+```
+### Add SSH key to GitHub
+- Copy the output of cat ~/.ssh/id_ed25519.pub
+- Go to GitHub → Settings → SSH and GPG Keys → New SSH key → Paste key → Save
+
+### Add remote repository
+```bash
+git remote add origin git@github.com:username/repo_name.git
+git remote -v
+```
+
+### Push to GitHub
+```bash
+git push -u origin main
+```
+### Optional: check if any submodules exist
+```bash
+git submodule status
+git submodule init
+git submodule update
+```
