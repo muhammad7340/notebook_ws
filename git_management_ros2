@@ -1,40 +1,139 @@
 ### Check if current folder is a git repo
 ```bash
-cd ~/ros2_ws
+cd ~/directory_ws
 git rev-parse --show-toplevel 2>/dev/null || echo "Not a git repo"
 ls -la | grep .git
 find src -type d -name ".git"
+```
+
+### Must add venv's requirements.txt 
+```bash
+cd ~/directory_ws
+source venv/bin/activate
+pip freeze > requirements.txt
+
+### so you could use it later to recreate the venv:
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Larger files view:
+```bash
+# Check for large files in the repository (greater than 50MB)- Github warnings, but allowed
+find . -type f -size +50M -not -path "./.git/*" -not -path "./build/*" -not -path "./install/*" -not -path "./log/*" -exec ls -lh {} \; | awk '{print $9, $5}'
+
+# check files >100MB, but exclude .git and venv folders (Github hard limit, not allowed)
+find . \( -path "*/.git" -o -path "*/venv" \) -prune -o \
+-type f -size +100M -exec ls -lh {} \;
+
+# check for large files in the repository (greater than 100MB) - Github hard limit, not allowed
+find . -type f -size +100M -not -path "./.git/*" -exec ls -lh {} \;
+
+
+
+# total size of the repository (excluding venv, build, install, log, and .git)
+du -sh --exclude=.git --exclude=venv --exclude=build --exclude=install --exclude=log .
+```
+
+### Larger Files Management:: Using LFS (Large File Storage)
+```bash
+# initilaize git (if not already done)
+git init
+git branch -M main
+
+# install git lfs (if not already done)
+sudo apt install git-lfs
+git lfs install
+
+# track large file types (e.g., .bag, .db3, .zip, .pth, .pt, .onnx, .mp4, .avi)
+git lfs track "src/vision/model/checkpoint_best_total.pth"
+git lfs track "src/vision/model/rfdetr.onnx"
+
+# check .gitattributes to confirm tracking
+cat .gitattributes
+
+# stage the .gitattributes file and the large files
+git add .gitattributes
+git add src/vision/model/checkpoint_best_total.pth
+git add src/vision/model/rfdetr.onnx
+# verify lfs is tracking the files
+git lfs ls-files
+
+# commit lfs files
+git commit -m "Add large model files using Git LFS"
+
+# push to GitHub (make sure to set up remote first)
+git remote add origin git@github.com:username/repo.git   # if not already set
+git push -u origin main
+
+```
+### If a git repository already exists, you can check its status and remote
+```bash
+git status
+git remote -v
+```
+
+### Handling existing git repositories: M1: Remove .git and Make Them Internal
+```bash
+cd ~/directory/subdirectory
+# removing all .git files from directory and subdirectories:
+find src -type d -name ".git" -exec rm -rf {} +
+rm -rf .git
+
+git add .
+git commit -m "Import external packages as internal directories"
+```
+
+### Handling existing git repositories: M2: Use Git Submodules
+```bash
+# first, remove all the mannual clones:
+rm -rf bitbots_tf_buffer
+rm -rf ros2_python_extension
+rm -rf mogi_trajectory_server
+
+# then, add them as submodules:
+git submodule add git@github.com:bit-bots/bitbots_tf_buffer.git bitbots_tf_buffer
+git submodule add git@github.com:bit-bots/ros2_python_extension.git ros2_python_extension
+git submodule add https://github.com/MOGI-ROS/mogi_trajectory_server.git mogi_trajectory_server
+
+
 ```
 ### Create a .gitignore file
 ```bash
 cd ~/ros2_ws
 nano .gitignore
 ```
+
 ### Example content for gitignore file (ROS2 + Python + large files)
 ```bash
-# ROS2
-build/
-install/
-log/
+# ROS2 build artifacts (anywhere)
+**/build/
+**/install/
+**/log/
+
+# Colcon / ament
+**/COLCON_IGNORE
 
 # Python
-__pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.swp
 
-# VSCode
+# Virtual environments (anywhere)
+**/.venv/
+**/venv/
+
+# IDE
 .vscode/
+.idea/
 
-### Virtual environments
-.venv/
-venv/
-
-### OS
+# OS
 .DS_Store
 
-### Large files
+# Large ML / robotics artifacts
 *.bag
 *.db3
 *.zip
@@ -43,6 +142,12 @@ venv/
 *.onnx
 *.mp4
 *.avi
+*.engine
+*.ckpt
+
+# Jupyter
+.ipynb_checkpoints/
+
 ```
 
 ### Initialize a new git repository
