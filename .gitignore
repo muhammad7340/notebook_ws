@@ -1,26 +1,30 @@
-# ROS2
-build/
-install/
-log/
+# ROS2 build artifacts (anywhere)
+**/build/
+**/install/
+**/log/
+
+# Colcon / ament
+**/COLCON_IGNORE
 
 # Python
-__pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.swp
 
-# VSCode
-.vscode/
+# Virtual environments (anywhere)
+**/.venv/
+**/venv/
 
-# Virtual environments
-.venv/
-venv/
+# IDE
+.vscode/
+.idea/
 
 # OS
 .DS_Store
 
-# Large files
+# Large ML / robotics artifacts
 *.bag
 *.db3
 *.zip
@@ -29,3 +33,8 @@ venv/
 *.onnx
 *.mp4
 *.avi
+*.engine
+*.ckpt
+
+# Jupyter
+.ipynb_checkpoints/
